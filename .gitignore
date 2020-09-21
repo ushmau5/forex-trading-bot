@@ -1,2 +1,6 @@
 *.DS_STORE
 *.idea
+*.pyc
+*/__pycache__/
+src/fx/results
+src/fx/data
