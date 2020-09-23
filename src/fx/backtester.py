@@ -1,4 +1,4 @@
-from fx.backest.backtest import Backtest
+from fx.backesting.backtest import Backtest
 from fx.settings import ROOT_PATH
 from fx.strategy.parallax_fx import ParallaxFXStrategy
 
@@ -34,7 +34,7 @@ PAIRS = [
 
 D1_DATA = {p: f'{ROOT_PATH}/data/D1/{p}_Candlestick_1_D_ASK_01.01.2015-01.01.2020.csv' for p in PAIRS}
 
-backtester = Backtest(data=D1_DATA, strategy=ParallaxFXStrategy, balance=100, risk=0.01)
+backtester = Backtest(data=D1_DATA, strategy=ParallaxFXStrategy, balance=100, risk=0.01, output_folder='Test_1')
 trades = backtester.start()
 backtester.analyse_trades(trades)
 a = 0

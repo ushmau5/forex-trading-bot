@@ -1,6 +1,6 @@
 import unittest
 
-from fx.trade.fibonacci_retracement import FibonacciRetracement
+from fx.trading.fibonacci_retracement import FibonacciRetracement
 
 
 class TestFibonacciRetracement(unittest.TestCase):

@@ -1,7 +1,7 @@
 from fx.settings import LOGGER
 from fx.strategy.strategy import Strategy
-from fx.trade.fibonacci_retracement import FibonacciRetracement
-from fx.trade.trade import Trade
+from fx.trading.fibonacci_retracement import FibonacciRetracement
+from fx.trading.trade import Trade
 
 
 class ParallaxFXStrategy(Strategy):

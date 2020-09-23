@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 
 from fx.settings import DATETIME_FORMAT
-from fx.trade.trade import Trade
+from fx.trading.trade import Trade
 
 
 class TestTrade(unittest.TestCase):

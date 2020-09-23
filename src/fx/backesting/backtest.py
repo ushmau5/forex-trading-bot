@@ -1,23 +1,23 @@
+from fx.backesting.backtest_utils import get_trade_data
 from fx.charts.candlestick_chart import CandlestickChart
+from fx.charts.equity_chart import EquityChart
+from fx.charts.trade_table import TradeTable
 from fx.settings import ROOT_PATH
 from fx.client.data_client import DataClient
 from fx.indicators.bollinger_bands import BollingerBands
 from fx.indicators.stochastic import Stochastic
 
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 
 
 class Backtest:
-    def __init__(self, data, strategy, balance, risk):
-        self.output_folder = "Test_2"
-
+    def __init__(self, data, strategy, balance, risk, output_folder):
         self.clients = []
         self.strategy = strategy
         self.start_balance = balance
         self.balance = balance
         self.risk = risk
+        self.output_folder = output_folder
         self.trades = []
         self.wins = 0
         self.losses = 0
@@ -66,11 +66,11 @@ class Backtest:
 
                     if trade.profit > 0:
                         self.wins += 1
-                        chart.write_image(f'{ROOT_PATH}/results/D1/{self.output_folder}/WIN_{trade.open_date}.png',
+                        chart.write_image(f'{ROOT_PATH}/results/{self.output_folder}/WIN_{trade.open_date}.png',
                                           width=1280, height=720)
                     elif trade.profit < 0:
                         self.losses += 1
-                        chart.write_image(f'{ROOT_PATH}/results/D1/{self.output_folder}/LOSS_{trade.open_date}.png',
+                        chart.write_image(f'{ROOT_PATH}/results/{self.output_folder}/LOSS_{trade.open_date}.png',
                                           width=1280, height=720)
 
     def _check_for_entry(self, client):
@@ -80,61 +80,14 @@ class Backtest:
             self.trades.append(trade)
 
     def analyse_trades(self, trades):
-        data = {'Pair': [],
-                'Order': [],
-                'Entry': [],
-                'SL': [],
-                'Pips_To_SL': [],
-                'TP': [],
-                'Pips_To_TP': [],
-                'RRR': [],
-                'Order_Date': [],
-                'Open_Date': [],
-                'Close_Date': [],
-                'Result': [],
-                'Profit': [],
-                'Balance': []
-                }
-
-        for t in trades:
-            data['Pair'].append(t.pair)
-            data['Order'].append(t.order_type)
-            data['Entry'].append(round(t.entry, 4))
-            data['SL'].append(round(t.stop_loss, 4))
-            data['Pips_To_SL'].append(round(t.pips_to_stop_loss, 2))
-            data['TP'].append(round(t.take_profit, 4))
-            data['Pips_To_TP'].append(round(t.pips_to_take_profit, 2))
-            data['RRR'].append(round(t.risk_reward_ratio, 2))
-            data['Order_Date'].append(t.order_date)
-            data['Open_Date'].append(t.open_date)
-            data['Close_Date'].append(t.close_date)
-            data['Result'].append('WIN' if t.profit > 0 else 'LOSS')
-            data['Profit'].append(round(t.profit, 2))
-            self.start_balance += t.profit
-            data['Balance'].append(round(self.start_balance, 2))
-
+        data = get_trade_data(self.start_balance, trades)
         df = pd.DataFrame(data)
 
         # Equity Chart
-        equity_fig = px.line(df, x='Order_Date', y="Balance")
-        equity_fig.show()
-        equity_fig.write_html(f'{ROOT_PATH}/results/D1/{self.output_folder}/equity_fig.html')
+        equity_chart = EquityChart.create(df, self.output_folder)
+        equity_chart.show()
 
-        # Trade List
-        data['Order_Date'] = [d.strftime('%d/%m/%y') if d is not None else d for d in data['Order_Date']]
-        data['Open_Date'] = [d.strftime('%d/%m/%y') if d is not None else d for d in data['Open_Date']]
-        data['Close_Date'] = [d.strftime('%d/%m/%y') if d is not None else d for d in data['Close_Date']]
-
-        df = pd.DataFrame(data)
-
-        colours = ['rgb(237,248,177)' if result == 'WIN' else 'rgb(254,224,210)' for result in data['Result']]
-
-        trades_fig = go.Figure(data=[go.Table(
-            header=dict(values=list(df.columns)),
-            cells=dict(values=[df.Pair, df.Order, df.Entry, df.SL, df.Pips_To_SL, df.TP, df.Pips_To_TP,
-                               df.RRR, df.Order_Date, df.Open_Date, df.Close_Date, df.Result, df.Profit, df.Balance],
-                       fill_color=[colours]))
-        ])
-        trades_fig.show()
-        trades_fig.write_html(f'{ROOT_PATH}/results/D1/{self.output_folder}/trade_fig.html')
+        # Trade Table
+        trade_table = TradeTable.create(df, self.output_folder)
+        trade_table.show()
 
