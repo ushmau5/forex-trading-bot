@@ -117,7 +117,7 @@ class ParallaxFXStrategy(Strategy):
             _df['Valid_Entry'].iloc[-1] = boolean_value
 
     @classmethod
-    def open_trade(cls, df, pair, balance, risk):
+    def open_trade(cls, df, pair, risk_amount):
         _df = df.copy()
         low = _df['Low'].iloc[-1]
         high = _df['High'].iloc[-1]
@@ -132,8 +132,7 @@ class ParallaxFXStrategy(Strategy):
                           entry=fib_levels[cls.entry_fib],
                           stop_loss=fib_levels[cls.stop_loss_fib],
                           take_profit=fib_levels[cls.take_profit_fib],
-                          balance=balance,
-                          risk=risk,
+                          risk_amount=risk_amount,
                           date=date)
         else:
             fib_levels = FibonacciRetracement.get_levels(min_price=low, max_price=high, mode='DESCENDING')
@@ -142,7 +141,6 @@ class ParallaxFXStrategy(Strategy):
                           entry=fib_levels[cls.entry_fib],
                           stop_loss=fib_levels[cls.stop_loss_fib],
                           take_profit=fib_levels[cls.take_profit_fib],
-                          balance=balance,
-                          risk=risk,
+                          risk_amount=risk_amount,
                           date=date)
         return trade
